@@ -1,24 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect, useCallback } from "react";
+import "./App.css";
+import CreatePost from "./components/CreatePost";
+import Header from "./components/Header";
+import Login from "./components/Login";
+import PostList from "./components/PostList";
+
+const functionsCount = new Set();
 
 function App() {
+  const [user, setUser] = useState("");
+  const [posts, setPosts] = useState([]);
+  const [count, setCount] = useState(0);
+
+  const handleAddPost = useCallback(
+    (newPost) => {
+      setPosts([newPost, ...posts]);
+    },
+    [posts]
+  );
+  console.log(handleAddPost);
+
+  useEffect(() => {
+    document.title = user ? `${user}'s feed` : "please login";
+  }, [user]);
+
+  if (!user) {
+    return <Login setUser={setUser} />;
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header user={user} setUser={setUser} />
+      <CreatePost user={user} handleAddPost={handleAddPost} />
+      <PostList posts={posts} />
+      <button onClick={() => setCount((prev) => prev + 1)}>{count}</button>
+    </>
   );
 }
 
