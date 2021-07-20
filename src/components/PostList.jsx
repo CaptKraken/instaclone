@@ -3,8 +3,8 @@ const PostList = ({ posts }) => {
   return (
     <>
       {posts &&
-        posts.map((post, i) => {
-          return <Post key={i} {...post} />;
+        posts.map((post) => {
+          return <Post key={post.id} {...post} />;
         })}
     </>
   );

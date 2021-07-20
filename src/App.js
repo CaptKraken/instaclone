@@ -1,24 +1,34 @@
-import { useState, useEffect, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useReducer,
+} from "react";
 import "./App.css";
 import CreatePost from "./components/CreatePost";
 import Header from "./components/Header";
 import Login from "./components/Login";
 import PostList from "./components/PostList";
+import postReducer from "./reducer";
 
-const functionsCount = new Set();
+export const UserContext = createContext();
+export const PostContext = createContext({
+  posts: [],
+});
 
 function App() {
+  const initialPostState = useContext(PostContext);
+  const [state, dispatch] = useReducer(postReducer, initialPostState);
   const [user, setUser] = useState("");
-  const [posts, setPosts] = useState([]);
-  const [count, setCount] = useState(0);
+  // const [posts, setPosts] = useState([]);
 
-  const handleAddPost = useCallback(
-    (newPost) => {
-      setPosts([newPost, ...posts]);
-    },
-    [posts]
-  );
-  console.log(handleAddPost);
+  // const handleAddPost = useCallback(
+  //   (newPost) => {
+  //     setPosts([newPost, ...state.posts]);
+  //   },
+  //   [posts]
+  // );
 
   useEffect(() => {
     document.title = user ? `${user}'s feed` : "please login";
@@ -28,12 +38,13 @@ function App() {
     return <Login setUser={setUser} />;
   }
   return (
-    <>
-      <Header user={user} setUser={setUser} />
-      <CreatePost user={user} handleAddPost={handleAddPost} />
-      <PostList posts={posts} />
-      <button onClick={() => setCount((prev) => prev + 1)}>{count}</button>
-    </>
+    <PostContext.Provider value={{ state, dispatch }}>
+      <UserContext.Provider value={user}>
+        <Header user={user} setUser={setUser} />
+        <CreatePost user={user} />
+        <PostList posts={state.posts} />
+      </UserContext.Provider>
+    </PostContext.Provider>
   );
 }
 
